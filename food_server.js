@@ -41,8 +41,8 @@ app.get('/api/search', async (req, res) => {
     // 從 MongoDB 中查詢資料，使用 $regex 和 $options: 'i' 來實現模糊搜尋（不區分大小寫）
     const foods = await mongoose.connection.db.collection('food').find({
       $or: [
-        { name: { $regex: query, $options: 'i' } },  // 查詢食物名稱
-        { nickname: { $regex: query, $options: 'i' } }  // 查詢食物俗名
+        { '樣品名稱': { $regex: query, $options: 'i' } },  // 查詢食物名稱
+        { '俗名': { $regex: query, $options: 'i' } }  // 查詢食物俗名
       ]
     }).toArray();  // 將結果轉換為陣列
 
