@@ -10,7 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB 連線字串
-const dbURI = 'mongodb+srv://leweivictory:NOxXkux7mjFvXetz@cluster0.sti8h.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const dbURI = "mongodb+srv://leweivictory:NOxXkux7mjFvXetz@cluster0.sti8h.mongodb.net/WesleyTest?retryWrites=true&w=majority&appName=Cluster0";
 
 mongoose.connect(dbURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log('MongoDB connected'))
