@@ -6,7 +6,13 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+//app.use(cors());
+app.use(
+  cors({
+    origin: "https://food-vue.onrender.com", // 替換成您的 Vue 項目部署的域名
+    methods: ["GET", "POST"],
+  })
+);
 app.use(express.json());
 
 // MongoDB 連線字串
