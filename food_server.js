@@ -6,13 +6,21 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// 這段中間件會在所有請求進來時記錄請求信息
+app.use((req, res, next) => {
+  console.log(`Received request: ${req.method} ${req.url}`);
+  next();
+});
+
 //app.use(cors());
+// 允許跨域請求
 app.use(
   cors({
     origin: "https://food-vue.onrender.com", // 替換成您的 Vue 項目部署的域名
     methods: ["GET", "POST"],
   })
 );
+
 app.use(express.json());
 
 // MongoDB 連線字串
