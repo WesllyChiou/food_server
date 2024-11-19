@@ -38,11 +38,14 @@ app.get('/api/search', async (req, res) => {
   }
 
   try {
+    // 去除查詢字串的前後空格，並加上 .*, 使其匹配任意位置的字串
+    const sanitizedQuery = query.trim();
+
     // 從 MongoDB 中查詢資料，使用 $regex 和 $options: 'i' 來實現模糊搜尋（不區分大小寫）
     const foods = await mongoose.connection.db.collection('food').find({
       $or: [
-        { '樣品名稱': { $regex: query, $options: 'i' } },  // 查詢食物名稱
-        { '俗名': { $regex: query, $options: 'i' } }  // 查詢食物俗名
+        { '樣品名稱': { $regex: `.*${sanitizedQuery}.*`, $options: 'i' } },  // 查詢食物名稱
+        { '俗名': { $regex: `.*${sanitizedQuery}.*`, $options: 'i' } }  // 查詢食物俗名
       ]
     }).toArray();  // 將結果轉換為陣列
 
@@ -52,6 +55,7 @@ app.get('/api/search', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
     // 啟動伺服器
     app.listen(PORT, '0.0.0.0', () => {
