@@ -48,13 +48,21 @@ app.get('/api/search', async (req, res) => {
       $options: 'i'  // 忽略大小寫
     }));
 
-    // 從 MongoDB 中查詢資料，使用 $or 檢查樣品名稱和俗名是否包含任意字詞
+    // 從 MongoDB 中查詢資料，使用 $and 確保每個字詞在樣品名稱或俗名中都能找到
     const foods = await mongoose.connection.db.collection('food').find({
-      $or: [
-        // 查詢食物名稱，匹配任何字詞
-        { '樣品名稱': { $regex: regexConditions.map(cond => cond.$regex).join('|'), $options: 'i' } },
-        // 查詢食物俗名，匹配任何字詞
-        { '俗名': { $regex: regexConditions.map(cond => cond.$regex).join('|'), $options: 'i' } }
+      $and: [
+        {
+          $or: [
+            { '樣品名稱': { $regex: regexConditions[0].$regex, $options: 'i' } },
+            { '俗名': { $regex: regexConditions[0].$regex, $options: 'i' } }
+          ]
+        },
+        ...regexConditions.slice(1).map(condition => ({
+          $or: [
+            { '樣品名稱': { $regex: condition.$regex, $options: 'i' } },
+            { '俗名': { $regex: condition.$regex, $options: 'i' } }
+          ]
+        }))
       ]
     }).toArray();  // 將結果轉換為陣列
 
@@ -64,6 +72,7 @@ app.get('/api/search', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
     // 啟動伺服器
