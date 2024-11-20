@@ -38,28 +38,21 @@ app.get('/api/search', async (req, res) => {
   }
 
   try {
-    // 去除查詢字串的前後空格，並分割字串為各個字詞
+    // 去除查詢字串的前後空格
     const sanitizedQuery = query.trim();
-    const queryParts = sanitizedQuery.split(/\s+/);  // 以空格分割字串，保留每個單字
-  
-    // 構造查詢條件，對每個字詞使用 $regex 匹配
-    const regexConditions = queryParts.map(part => ({
-      $regex: `.*${part}.*`,  // 使用正則表達式來模糊匹配字詞
-      $options: 'i'  // 忽略大小寫
-    }));
-  
-    // 從 MongoDB 中查詢資料，只查詢樣品名稱
+
+    // 構造查詢條件，對"樣品名稱"欄位使用正則表達式
     const foods = await mongoose.connection.db.collection('food').find({
-      '樣品名稱': { $regex: regexConditions.map(condition => condition.$regex).join('|'), $options: 'i' }
+      '樣品名稱': { $regex: `.*${sanitizedQuery}.*`, $options: 'i' }  // 查詢食物名稱，忽略大小寫
     }).toArray();  // 將結果轉換為陣列
-  
+
     res.json(foods);  // 返回查詢結果
   } catch (err) {
     console.error('Error searching foods:', err);
     res.status(500).send('Internal Server Error');
   }
-  
 });
+
 
 
     // 啟動伺服器
