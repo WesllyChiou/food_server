@@ -42,32 +42,16 @@ app.get('/api/search', async (req, res) => {
     const sanitizedQuery = query.trim();
     const queryParts = sanitizedQuery.split(/\s+/);  // 以空格分割字串，保留每個單字
 
-    // 首先嘗試完全匹配的情況
-    const exactMatchQuery = sanitizedQuery;
-
-    // 如果完全匹配結果為空，則進行逐字詞匹配
+    // 構建正則表達式條件
     const regexConditions = queryParts.map(part => ({
       $regex: `.*${part}.*`,  // 使用正則表達式來模糊匹配字詞
       $options: 'i'  // 忽略大小寫
     }));
 
-    // 查詢食物名稱或俗名中完全匹配的情況
-    let foods = await mongoose.connection.db.collection('food').find({
-      $or: [
-        { '樣品名稱': { $regex: `.*${exactMatchQuery}.*`, $options: 'i' } },  // 完全匹配食物名稱
-        { '俗名': { $regex: `.*${exactMatchQuery}.*`, $options: 'i' } }  // 完全匹配食物俗名
-      ]
-    }).toArray();
-
-    // 如果沒有結果，則進行逐字詞匹配
-    if (foods.length === 0) {
-      foods = await mongoose.connection.db.collection('food').find({
-        $or: [
-          { '樣品名稱': { $regex: regexConditions[0], $options: 'i' } },  // 查詢食物名稱，匹配第一個字詞
-          { '俗名': { $regex: regexConditions[0], $options: 'i' } }  // 查詢食物俗名，匹配第一個字詞
-        ]
-      }).toArray();  // 將結果轉換為陣列
-    }
+    // 查詢單一欄位 "樣品名稱" 中是否包含查詢字詞
+    const foods = await mongoose.connection.db.collection('food').find({
+      '樣品名稱': { $all: regexConditions }
+    }).toArray();  // 將結果轉換為陣列
 
     res.json(foods);  // 返回查詢結果
   } catch (err) {
@@ -75,6 +59,7 @@ app.get('/api/search', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
     // 啟動伺服器
     app.listen(PORT, '0.0.0.0', () => {
