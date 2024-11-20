@@ -50,9 +50,11 @@ app.get('/api/search', async (req, res) => {
       $options: 'i'  // 忽略大小寫
     }));
 
-    // 查詢 "樣品名稱" 欄位，對每個字詞進行匹配
+    // 查詢 "樣品名稱" 欄位，使用 $or 查詢任意一個字詞匹配
     const foods = await mongoose.connection.db.collection('food').find({
-      '樣品名稱': { $all: regexConditions }  // 查詢所有條件
+      $or: regexConditions.map(cond => ({
+        '樣品名稱': cond  // 查詢每個條件
+      }))
     }).toArray();  // 將結果轉換為陣列
 
     res.json(foods);  // 返回查詢結果
@@ -61,6 +63,7 @@ app.get('/api/search', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
     // 啟動伺服器
