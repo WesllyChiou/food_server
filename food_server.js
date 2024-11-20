@@ -44,15 +44,15 @@ app.get('/api/search', async (req, res) => {
 
     // 構造查詢條件，對每個字詞使用 $regex 匹配
     const regexConditions = queryParts.map(part => ({
-      $regex: `.*${part}.*`,
+      $regex: `.*${part}.*`,  // 使用正則表達式來模糊匹配字詞
       $options: 'i'  // 忽略大小寫
     }));
 
-    // 從 MongoDB 中查詢資料，使用 $or 來檢查樣品名稱和俗名是否包含每個字詞
+    // 從 MongoDB 中查詢資料，使用 $or 檢查樣品名稱和俗名是否包含任意字詞
     const foods = await mongoose.connection.db.collection('food').find({
       $or: [
-        { '樣品名稱': { $in: regexConditions } },  // 查詢食物名稱，包含所有字詞
-        { '俗名': { $in: regexConditions } }  // 查詢食物俗名，包含所有字詞
+        { '樣品名稱': { $regex: regexConditions[0], $options: 'i' } },  // 查詢食物名稱，匹配第一個字詞
+        { '俗名': { $regex: regexConditions[0], $options: 'i' } }  // 查詢食物俗名，匹配第一個字詞
       ]
     }).toArray();  // 將結果轉換為陣列
 
