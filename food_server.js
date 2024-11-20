@@ -59,6 +59,7 @@ app.get('/api/search', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
   
+});
 
 
     // 啟動伺服器
