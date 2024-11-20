@@ -51,8 +51,8 @@ app.get('/api/search', async (req, res) => {
     // 從 MongoDB 中查詢資料，使用 $or 來檢查樣品名稱和俗名是否包含每個字詞
     const foods = await mongoose.connection.db.collection('food').find({
       $or: [
-        { '樣品名稱': { $all: regexConditions } },  // 查詢食物名稱，包含所有字詞
-        { '俗名': { $all: regexConditions } }  // 查詢食物俗名，包含所有字詞
+        { '樣品名稱': { $in: regexConditions } },  // 查詢食物名稱，包含所有字詞
+        { '俗名': { $in: regexConditions } }  // 查詢食物俗名，包含所有字詞
       ]
     }).toArray();  // 將結果轉換為陣列
 
