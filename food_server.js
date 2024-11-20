@@ -38,19 +38,15 @@ app.get('/api/search', async (req, res) => {
   }
 
   try {
-    // 去除查詢字串的前後空格，並分割字串為各個字詞
+    // 去除查詢字串的前後空格，並加上 .*, 使其匹配任意位置的字串
     const sanitizedQuery = query.trim();
-    const queryParts = sanitizedQuery.split(/\s+/);  // 以空格分割字串，保留每個單字
 
-    // 構建正則表達式條件
-    const regexConditions = queryParts.map(part => ({
-      $regex: `.*${part}.*`,  // 使用正則表達式來模糊匹配字詞
-      $options: 'i'  // 忽略大小寫
-    }));
-
-    // 查詢單一欄位 "樣品名稱" 中是否包含查詢字詞
+    // 從 MongoDB 中查詢資料，使用 $regex 和 $options: 'i' 來實現模糊搜尋（不區分大小寫）
     const foods = await mongoose.connection.db.collection('food').find({
-      '樣品名稱': { $all: regexConditions }
+      $or: [
+        { '樣品名稱': { $regex: `.*${sanitizedQuery}.*`, $options: 'i' } }  // 查詢食物名稱
+         // 查詢食物俗名
+      ]
     }).toArray();  // 將結果轉換為陣列
 
     res.json(foods);  // 返回查詢結果
