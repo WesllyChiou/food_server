@@ -64,9 +64,24 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
-
+// 預熱查詢函式
+const warmUpDatabase = async () => {
+  try {
+    console.log('Executing warm-up query...');
+    const result = await mongoose.connection.db.collection('food').findOne({});
+    if (result) {
+      console.log('Warm-up query succeeded:', result);
+    } else {
+      console.log('Warm-up query found no data.');
+    }
+  } catch (err) {
+    console.error('Warm-up query failed:', err);
+  }
+};
 
     // 啟動伺服器
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server is running on http://0.0.0.0:${PORT}`);
+       // 執行預熱查詢
+  await warmUpDatabase();
     });
