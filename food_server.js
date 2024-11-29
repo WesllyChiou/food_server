@@ -68,7 +68,9 @@ app.get('/api/search', async (req, res) => {
 const warmUpDatabase = async () => {
   try {
     console.log('Executing warm-up query...');
-    const result = await mongoose.connection.db.collection('food').findOne({});
+    const Food = mongoose.model('Food', new mongoose.Schema({ name: String }));
+
+    const result = await Food.findOne({});
     if (result) {
       console.log('Warm-up query succeeded:', result);
     } else {
