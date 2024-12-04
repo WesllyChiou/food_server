@@ -64,6 +64,12 @@ app.get('/api/search', async (req, res) => {
   }
 });
 
+//定期檢查應用是否正常運行
+app.get('/health', (req, res) => { 
+  res.status(200).send('OK'); // 回傳 HTTP 狀態碼 200，表示應用正常
+});
+
+
 // 預熱查詢函式
 const warmUpDatabase = async () => {
   try {
@@ -86,5 +92,5 @@ app.listen(PORT, '0.0.0.0', async () => {
   console.log(`Server is running on http://0.0.0.0:${PORT}`);
 
   // 執行預熱查詢
-  await warmUpDatabase();
+await warmUpDatabase();
 });
